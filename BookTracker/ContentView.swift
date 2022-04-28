@@ -8,9 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @FetchRequest(sortDescriptors: []) var books: FetchedResults<Book>
+    @State private var showingAddBookView = false
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            Text(String(books.count))
+                .navigationTitle("Book Tracker")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showingAddBookView.toggle()
+                        } label: {
+                            Label("Add Book", systemImage: "plus")
+                        }
+                    }
+                }
+        }
+        .sheet(isPresented: $showingAddBookView) {
+            AddBookView()
+        }
     }
 }
 
