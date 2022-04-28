@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct AddBookView: View {
     @Environment(\.managedObjectContext) var moc
+    @Environment(\.dismiss) var dismiss
     @State private var title = ""
     @State private var author = ""
     @State private var genre = ""
@@ -30,24 +32,34 @@ struct AddBookView: View {
                 }
                 Section {
                     TextEditor(text: $review)
-                    Picker("Your rating", selection: $rating) {
-                        ForEach(0..<6) {
-                            Text(String($0))
-                        }
-                    }
+                    BookRatingView(rating: $rating)
                 } header: {
                     Text("Write your review about this book")
                 }
                 Section {
                     Button("Save") {
                         let newBook = Book(context: moc)
+                        newBook.id = UUID()
                         newBook.title = title
                         newBook.author = author
                         newBook.genre = genre
                         newBook.review = review
                         newBook.rating = Int16(rating)
                         try? moc.save()
+                        dismiss()
                     }
+     
+//                    JUST FOR DELETE ALL DATA OF BOOK INSTANCE
+//                    Button("Reset all") {
+//                        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Book")
+//                        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+//                        do {
+//                            try moc.execute(batchDeleteRequest)
+//                            dismiss()
+//                        } catch {
+//                            print("Error")
+//                        }
+//                    }
                 }
             }
             .navigationTitle("Add New Book")
@@ -59,5 +71,6 @@ struct AddBookView: View {
 struct AddBookView_Previews: PreviewProvider {
     static var previews: some View {
         AddBookView()
+.previewInterfaceOrientation(.portrait)
     }
 }
