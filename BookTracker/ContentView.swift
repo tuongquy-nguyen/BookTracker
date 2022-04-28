@@ -13,6 +13,7 @@ struct ContentView: View {
         SortDescriptor(\.title),
         SortDescriptor(\.author)
     ]) var books: FetchedResults<Book>
+    @Environment(\.managedObjectContext) var moc
     
     @State private var showingAddBookView = false
     
@@ -35,9 +36,14 @@ struct ContentView: View {
                         }
                     }
                 }
+                .onDelete(perform: deleteBook)
             }
             .navigationTitle("Book Tracker")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    EditButton()
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showingAddBookView.toggle()
@@ -50,6 +56,14 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddBookView) {
             AddBookView()
         }
+    }
+    
+    func deleteBook(at offsets: IndexSet) {
+        for offset in offsets {
+            let book = books[offset]
+            moc.delete(book)
+        }
+//        try? moc.save()
     }
 }
 
